@@ -1,0 +1,9 @@
+sample_id,honey_id,adulteration_pct,a520_mean,adulterant,a520_rep1,a520_rep2
+S1_HCS00,Pilot_S1,0.0,0.325,corn_syrup,,
+S1_HCS25,Pilot_S1,25.0,0.212,corn_syrup,,
+S1_HCS50,Pilot_S1,50.0,0.137,corn_syrup,,
+S1_HCS75,Pilot_S1,75.0,0.093,corn_syrup,,
+S2_HCS00,Pilot_S2,0.0,0.448,corn_syrup,0.429,0.466
+S2_HCS25,Pilot_S2,25.0,0.36,corn_syrup,0.353,0.366
+S2_HCS50,Pilot_S2,50.0,0.264,corn_syrup,0.259,0.268
+S2_HCS75,Pilot_S2,75.0,0.127,corn_syrup,0.115,0.138

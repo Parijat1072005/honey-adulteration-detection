@@ -1,0 +1,20 @@
+sample_id,sample_type,honey_id,honey_type,honey_pct,adulteration_pct,a520_rep1,a520_rep2,proline_ug_ml,image_path
+STD_000,standard,None,Proline Standard,NaN,NaN,0.110,0.115,0.0,data/raw/standards/std_000ug_ml.jpg
+STD_020,standard,None,Proline Standard,NaN,NaN,0.239,0.244,20.0,data/raw/standards/std_020ug_ml.jpg
+STD_040,standard,None,Proline Standard,NaN,NaN,0.313,0.351,40.0,data/raw/standards/std_040ug_ml.jpg
+STD_060,standard,None,Proline Standard,NaN,NaN,0.503,0.512,60.0,data/raw/standards/std_060ug_ml.jpg
+STD_080,standard,None,Proline Standard,NaN,NaN,0.569,0.583,80.0,data/raw/standards/std_080ug_ml.jpg
+STD_100,standard,None,Proline Standard,NaN,NaN,0.603,0.588,100.0,data/raw/standards/std_100ug_ml.jpg
+STD_150,standard,None,Proline Standard,NaN,NaN,0.828,0.859,150.0,data/raw/standards/std_150ug_ml.jpg
+STD_200,standard,None,Proline Standard,NaN,NaN,0.969,0.977,200.0,data/raw/standards/std_200ug_ml.jpg
+H2_100,honey,H2,Light floral honey,100.0,0.0,0.312,0.313,,data/raw/honey_h2/h2_100pct_honey.jpg
+H2_080,honey,H2,Light floral honey,80.0,20.0,0.287,0.290,,data/raw/honey_h2/h2_080pct_honey.jpg
+H2_060,honey,H2,Light floral honey,60.0,40.0,0.247,0.230,,data/raw/honey_h2/h2_060pct_honey.jpg
+H2_040,honey,H2,Light floral honey,40.0,60.0,0.165,0.196,,data/raw/honey_h2/h2_040pct_honey.jpg
+H2_020,honey,H2,Light floral honey,20.0,80.0,0.129,0.143,,data/raw/honey_h2/h2_020pct_honey.jpg
+H4_100,honey,H4,Dark amber honey,100.0,0.0,0.505,0.516,,data/raw/honey_h4/h4_100pct_honey.jpg
+H4_080,honey,H4,Dark amber honey,80.0,20.0,0.438,0.429,,data/raw/honey_h4/h4_080pct_honey.jpg
+H4_060,honey,H4,Dark amber honey,60.0,40.0,0.379,0.371,,data/raw/honey_h4/h4_060pct_honey.jpg
+H4_040,honey,H4,Dark amber honey,40.0,60.0,0.237,0.260,,data/raw/honey_h4/h4_040pct_honey.jpg
+H4_020,honey,H4,Dark amber honey,20.0,80.0,0.158,0.178,,data/raw/honey_h4/h4_020pct_honey.jpg
+

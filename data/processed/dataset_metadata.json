@@ -1,0 +1,15 @@
+{
+  "standard_curve": {
+    "equation": "A520 = 0.00476 * Proline(ug/mL) + 0.1125",
+    "slope": 0.004759644970414201,
+    "intercept": 0.1125,
+    "r2": 0.9848197807773121,
+    "blank_a520": 0.1125
+  },
+  "dilution_factor": 20.0,
+  "authentic_min_proline_mg_kg": 180.0,
+  "samples_count": 18,
+  "standards_count": 8,
+  "honey_samples_count": 10,
+  "manifest_path": "C:\\Users\\Parijat\\Desktop\\honey-adulteration-detection\\data\\raw\\experiment_manifest.csv"
+}

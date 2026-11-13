@@ -1,0 +1,184 @@
+{
+  "stage_a": {
+    "best_model": "Beer-Lambert (OD_G only)",
+    "candidates": {
+      "Beer-Lambert (OD_G only)": {
+        "loocv_r2": 0.9224,
+        "loocv_rmse": 0.0647,
+        "loocv_mae": 0.0554,
+        "pearson_r": 0.9605
+      },
+      "Multi-Color Ridge Regression": {
+        "loocv_r2": 0.8892,
+        "loocv_rmse": 0.0773,
+        "loocv_mae": 0.0616,
+        "pearson_r": 0.9445
+      },
+      "Multi-Color Linear Regression": {
+        "loocv_r2": 0.5413,
+        "loocv_rmse": 0.1574,
+        "loocv_mae": 0.092,
+        "pearson_r": 0.7583
+      },
+      "Random Forest Regressor": {
+        "loocv_r2": 0.8549,
+        "loocv_rmse": 0.0885,
+        "loocv_mae": 0.0671,
+        "pearson_r": 0.9296
+      },
+      "Support Vector Regressor (SVR)": {
+        "loocv_r2": 0.904,
+        "loocv_rmse": 0.072,
+        "loocv_mae": 0.0592,
+        "pearson_r": 0.9561
+      }
+    }
+  },
+  "stage_b": {
+    "best_model": "Ridge Regression",
+    "candidates": {
+      "Ridge Regression": {
+        "loocv_r2": 0.5487,
+        "loocv_rmse": 19.002,
+        "loocv_mae": 15.3358,
+        "loho_mae": 26.1824,
+        "loho_rmse": 28.6368,
+        "loho_folds": {
+          "test_on_H2": {
+            "true": [
+              0.0,
+              20.0,
+              40.0,
+              60.0,
+              80.0
+            ],
+            "pred": [
+              33.0923904680215,
+              43.76385230366405,
+              87.00012463302376,
+              85.91238158711249,
+              99.19260855394393
+            ],
+            "mae": 29.792271509153146
+          },
+          "test_on_H4": {
+            "true": [
+              0.0,
+              20.0,
+              40.0,
+              60.0,
+              80.0
+            ],
+            "pred": [
+              0.0,
+              0.0,
+              7.146317550962067,
+              27.53121474303932,
+              52.460139988148434
+            ],
+            "mae": 22.572465543570036
+          }
+        }
+      },
+      "Linear Regression": {
+        "loocv_r2": -1.7967,
+        "loocv_rmse": 47.3006,
+        "loocv_mae": 38.8256,
+        "loho_mae": 26.3117,
+        "loho_rmse": 28.9004,
+        "loho_folds": {
+          "test_on_H2": {
+            "true": [
+              0.0,
+              20.0,
+              40.0,
+              60.0,
+              80.0
+            ],
+            "pred": [
+              35.50281966407892,
+              44.74246652211155,
+              80.33730819933297,
+              84.53626674152709,
+              97.30910764062489
+            ],
+            "mae": 28.485593753535078
+          },
+          "test_on_H4": {
+            "true": [
+              0.0,
+              20.0,
+              40.0,
+              60.0,
+              80.0
+            ],
+            "pred": [
+              0.0,
+              0.0,
+              0.0,
+              22.260190572678354,
+              57.05048075558196
+            ],
+            "mae": 24.137865734347937
+          }
+        }
+      },
+      "Random Forest": {
+        "loocv_r2": 0.313,
+        "loocv_rmse": 23.4443,
+        "loocv_mae": 22.0133,
+        "loho_mae": 22.6,
+        "loho_rmse": 25.1246,
+        "loho_folds": {
+          "test_on_H2": {
+            "true": [
+              0.0,
+              20.0,
+              40.0,
+              60.0,
+              80.0
+            ],
+            "pred": [
+              35.2,
+              41.2,
+              71.2,
+              72.0,
+              72.0
+            ],
+            "mae": 21.520000000000003
+          },
+          "test_on_H4": {
+            "true": [
+              0.0,
+              20.0,
+              40.0,
+              60.0,
+              80.0
+            ],
+            "pred": [
+              9.2,
+              9.2,
+              6.8,
+              24.8,
+              50.0
+            ],
+            "mae": 23.68
+          }
+        }
+      }
+    }
+  },
+  "stage_c": {
+    "loocv_r2": 0.5603,
+    "loocv_rmse": 18.7545,
+    "loocv_mae": 15.3072
+  },
+  "stage_d": {
+    "loocv_r2": 0.4476,
+    "loocv_rmse": 21.0225,
+    "loocv_mae": 17.1359
+  },
+  "stage_e": {
+    "binary_classifier_accuracy": 0.9
+  }
+}

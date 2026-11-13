@@ -1,0 +1,11 @@
+sample_id,sample_type,honey_id,honey_type,honey_pct,adulteration_pct,a520_rep1,a520_rep2,proline_ug_ml,image_path
+# Examples:
+# For a new genuine honey sample (Mustard honey 100%):
+# MUSTARD_100,honey,Mustard,Mustard floral honey,100.0,0.0,0.380,0.385,,data/raw/honey_mustard/mustard_100pct.jpg
+#
+# For a 20% adulterated sample (80% mustard honey, 20% corn syrup):
+# MUSTARD_080,honey,Mustard,Mustard floral honey,80.0,20.0,0.310,0.315,,data/raw/honey_mustard/mustard_080pct.jpg
+#
+# For a standard curve tube (if you ran a new standard):
+# STD_NEW_050,standard,None,Proline Standard,NaN,NaN,0.410,0.415,50.0,data/raw/standards/std_new_050.jpg
+
