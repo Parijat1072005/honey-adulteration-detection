@@ -21,7 +21,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from PIL import Image
+from PIL import Image, ImageOps
 
 from src.config import (
     PROJECT_ROOT,
@@ -35,6 +35,33 @@ from src.config import (
 from src.features.roi_detector import TubeROIDetector
 from src.features.extractor import TubeFeatureExtractor
 from predict import HoneyAdulterationPredictor
+
+def load_and_preprocess_image(file_or_path, max_dim: int = 1600) -> Image.Image:
+    """
+    Safely opens an image from file path or uploaded buffer,
+    auto-corrects smartphone EXIF rotation, ensures standard RGB,
+    and downsamples huge smartphone camera photos (e.g. 48MP)
+    to prevent mobile browser memory freezes.
+    """
+    if isinstance(file_or_path, (str, Path)):
+        img = Image.open(file_or_path)
+    else:
+        img = Image.open(file_or_path)
+    
+    # 1. Auto-orient image based on mobile camera EXIF orientation tag
+    img = ImageOps.exif_transpose(img)
+    
+    # 2. Convert to standard RGB (drops RGBA, CMYK, etc.)
+    if img.mode != "RGB":
+        img = img.convert("RGB")
+        
+    # 3. Downscale if image is massive (e.g. 48MP phone cameras: 8000x6000)
+    if max(img.size) > max_dim:
+        scale = max_dim / max(img.size)
+        new_size = (int(img.width * scale), int(img.height * scale))
+        img = img.resize(new_size, Image.Resampling.LANCZOS)
+        
+    return img
 
 # Page Configuration - Collapsed sidebar
 st.set_page_config(
@@ -330,6 +357,42 @@ st.markdown("""
         text-align: center;
         font-size: 0.8rem;
     }
+
+    /* Mobile Responsive Optimizations */
+    @media (max-width: 768px) {
+        .amz-header-main {
+            margin: -2rem -1rem 0 -1rem !important;
+            padding: 12px 14px !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 8px !important;
+        }
+        .amz-header-right {
+            display: none !important;
+        }
+        .amz-deliver-tag {
+            margin-left: 0 !important;
+            border-left: none !important;
+            padding-left: 0 !important;
+        }
+        .amz-subnav {
+            margin: 0 -1rem 12px -1rem !important;
+            padding: 8px 12px !important;
+            font-size: 0.76rem !important;
+            flex-wrap: wrap !important;
+            gap: 6px !important;
+        }
+        .gold-back-to-top {
+            margin: 20px -1rem 0 -1rem !important;
+        }
+        .amz-footer {
+            margin: 0 -1rem -2rem -1rem !important;
+            padding: 16px 12px !important;
+        }
+        div[data-testid="stImage"] img {
+            max-height: 280px !important;
+        }
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -386,6 +449,8 @@ if "floral_prior" not in st.session_state:
     st.session_state.floral_prior = "Auto-detect / Generic Model (Codex Global Cutoff ≥ 180 mg/kg)"
 if "has_predicted" not in st.session_state:
     st.session_state.has_predicted = False
+if "image_rotation" not in st.session_state:
+    st.session_state.image_rotation = 0
 
 
 @st.cache_resource
@@ -457,20 +522,31 @@ if st.session_state.module == "🧪 Live Analytical Predictor":
                     st.session_state.preset_choice = "H4: 100% Pure Dark Amber Honey (0% adulteration)"
                     st.session_state.floral_prior = "Auto-detect / Generic Model (Codex Global Cutoff ≥ 180 mg/kg)"
                     st.session_state.has_predicted = False
+                    st.session_state.image_rotation = 0
                     st.rerun()
                 st.markdown('</div>', unsafe_allow_html=True)
 
-            # Input Mode Selection
+            # Mobile-Optimized Input Mode Selection
+            input_options = [
+                "Select Verified Benchmark Tube",
+                "📸 Capture Live with Camera (Phone/Web)",
+                "📁 Upload Image from Device (Gallery/Files)"
+            ]
+            current_mode = st.session_state.input_mode
+            if current_mode not in input_options:
+                current_mode = input_options[0]
+
             input_choice = st.radio(
                 "Input Mode:",
-                ["Select Verified Benchmark Tube", "Upload Laboratory Photograph"],
-                index=0 if st.session_state.input_mode == "Select Verified Benchmark Tube" else 1,
+                input_options,
+                index=input_options.index(current_mode),
                 horizontal=True,
                 key="radio_input_mode"
             )
             if input_choice != st.session_state.input_mode:
                 st.session_state.input_mode = input_choice
                 st.session_state.has_predicted = False
+                st.session_state.image_rotation = 0
                 st.rerun()
 
             sample_img = None
@@ -504,23 +580,41 @@ if st.session_state.module == "🧪 Live Analytical Predictor":
                 if selected_preset != st.session_state.preset_choice:
                     st.session_state.preset_choice = selected_preset
                     st.session_state.has_predicted = False
+                    st.session_state.image_rotation = 0
                     st.rerun()
 
                 sample_img_path = preset_options[selected_preset]
-                sample_img = Image.open(sample_img_path)
+                sample_img = load_and_preprocess_image(sample_img_path)
                 sample_name = selected_preset
+            elif input_choice == "📸 Capture Live with Camera (Phone/Web)":
+                camera_file = st.camera_input(
+                    "Point smartphone camera directly at reaction tube:",
+                    key=f"camera_{st.session_state.uploader_key}"
+                )
+                if camera_file is not None:
+                    try:
+                        sample_img = load_and_preprocess_image(camera_file)
+                        sample_name = "Live Camera Capture"
+                    except Exception as e:
+                        st.error(f"Error reading camera image: {e}")
+                else:
+                    st.session_state.has_predicted = False
+                    st.info("📸 Aim your camera at the reaction tube in front of white paper and click **Take Photo**.")
             else:
                 uploaded_file = st.file_uploader(
-                    "Upload Tube Photograph (JPG, PNG):",
-                    type=["jpg", "jpeg", "png"],
+                    "Select Tube Photograph (JPG, PNG, WEBP):",
+                    type=["jpg", "jpeg", "png", "webp"],
                     key=f"uploader_{st.session_state.uploader_key}"
                 )
                 if uploaded_file is not None:
-                    sample_img = Image.open(uploaded_file)
-                    sample_name = uploaded_file.name
+                    try:
+                        sample_img = load_and_preprocess_image(uploaded_file)
+                        sample_name = uploaded_file.name
+                    except Exception as e:
+                        st.error(f"Error processing image file: {e}")
                 else:
                     st.session_state.has_predicted = False
-                    st.info("📁 Drag and drop or upload a reaction tube photo to begin.")
+                    st.info("📁 Tap browse or drag a tube photo from your phone gallery or files.")
 
             # Botanical Prior Selector
             st.markdown("<hr style='margin: 10px 0; border: 0.5px solid #E5EBE6;'>", unsafe_allow_html=True)
@@ -570,9 +664,24 @@ if st.session_state.module == "🧪 Live Analytical Predictor":
                     st.session_state.measured_a520_val = measured_a520
                     st.session_state.has_predicted = False
 
-            # Equal Sized Image Previews
+            # Mobile Orientation Adjuster & Image Previews
             if sample_img is not None:
+                # Apply manual rotation if requested
+                if st.session_state.image_rotation != 0:
+                    sample_img = sample_img.rotate(-st.session_state.image_rotation, expand=True)
+
                 st.markdown("<hr style='margin: 10px 0; border: 0.5px solid #E5EBE6;'>", unsafe_allow_html=True)
+                
+                # Mobile rotation controller
+                c_rot_info, c_rot_btn = st.columns([2.5, 1.5])
+                with c_rot_info:
+                    st.caption("📱 *If your phone camera took the photo sideways, tap to rotate:*")
+                with c_rot_btn:
+                    if st.button("🔄 Rotate 90°", key="btn_rotate_img_90", help="Rotate image clockwise to make tube vertical"):
+                        st.session_state.image_rotation = (st.session_state.image_rotation + 90) % 360
+                        st.session_state.has_predicted = False
+                        st.rerun()
+
                 roi, bbox, valid_mask = predictor.extractor.roi_detector.extract_roi(sample_img)
                 
                 c_full, c_roi = st.columns(2)
@@ -582,14 +691,14 @@ if st.session_state.module == "🧪 Live Analytical Predictor":
                         Acquired Photograph
                     </div>
                     """, unsafe_allow_html=True)
-                    st.image(sample_img, use_container_width=True)
+                    st.image(sample_img, width='stretch')
                 with c_roi:
                     st.markdown("""
                     <div style="font-size: 0.8rem; font-weight: 700; color: #4B6354; margin-bottom: 4px;">
                         Extracted Liquid ROI (Glare Filtered)
                     </div>
                     """, unsafe_allow_html=True)
-                    st.image(roi, use_container_width=True)
+                    st.image(roi, width='stretch')
 
     # --- RIGHT CONTAINER: DIAGNOSTIC REPORT (CLEAN FRONT VIEW, BUTTON ON RIGHT) ---
     with col_result:
@@ -728,7 +837,7 @@ elif st.session_state.module == "📊 Proline Standard Calibration":
         
         col1, col2 = st.columns([1.2, 1], gap="large")
         with col1:
-            st.image(str(FIGURES_DIR / "proline_standard_curve.png"), use_container_width=True)
+            st.image(str(FIGURES_DIR / "proline_standard_curve.png"), width='stretch')
 
         with col2:
             st.subheader("Linear Calibration Model")
@@ -757,13 +866,13 @@ elif st.session_state.module == "🔬 Optical & Color Space Explorer":
         Defining **Green Channel Optical Density**:
         $$OD_G = -\\log_{10}(G / G_{\\text{blank}})$$
         """)
-        st.image(str(FIGURES_DIR / "beer_lambert_od_vs_a520.png"), use_container_width=True)
+        st.image(str(FIGURES_DIR / "beer_lambert_od_vs_a520.png"), width='stretch')
 
         col1, col2 = st.columns(2, gap="medium")
         with col1:
-            st.image(str(FIGURES_DIR / "color_trajectory_adulteration.png"), use_container_width=True)
+            st.image(str(FIGURES_DIR / "color_trajectory_adulteration.png"), width='stretch')
         with col2:
-            st.image(str(FIGURES_DIR / "correlation_heatmap.png"), use_container_width=True)
+            st.image(str(FIGURES_DIR / "correlation_heatmap.png"), width='stretch')
 
         st.subheader("Extracted Multi-Color Feature Master Matrix")
         st.dataframe(
@@ -781,7 +890,7 @@ elif st.session_state.module == "📈 Model Benchmarks & Validation":
 
         col1, col2 = st.columns([1.2, 1], gap="large")
         with col1:
-            st.image(str(FIGURES_DIR / "model_benchmarks_stages.png"), use_container_width=True)
+            st.image(str(FIGURES_DIR / "model_benchmarks_stages.png"), width='stretch')
 
         with col2:
             st.markdown("#### Peer-Reviewed Model Performance")

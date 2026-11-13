@@ -4,7 +4,7 @@ excluding glass glare, tube meniscus, labels, and background.
 """
 from typing import Tuple, Optional, Dict
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageOps
 from src.config import DEFAULT_ROI
 
 
@@ -36,10 +36,14 @@ class TubeROIDetector:
             glare_mask: boolean mask indicating valid non-glare liquid pixels
         """
         if isinstance(image_input, str):
-            img = Image.open(image_input).convert("RGB")
+            img = Image.open(image_input)
+            img = ImageOps.exif_transpose(img)
+            img = img.convert("RGB")
             arr = np.array(img)
         elif isinstance(image_input, Image.Image):
-            arr = np.array(image_input.convert("RGB"))
+            img = ImageOps.exif_transpose(image_input)
+            img = img.convert("RGB")
+            arr = np.array(img)
         elif isinstance(image_input, np.ndarray):
             arr = image_input.copy()
             if arr.ndim == 2:
